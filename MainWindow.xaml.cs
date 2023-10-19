@@ -17,6 +17,8 @@ using System.Windows.Shapes;
 using System.Windows.Threading;
 using System.Text.RegularExpressions;
 using static System.Net.Mime.MediaTypeNames;
+using System.Globalization;
+using System.Windows.Media.Media3D;
 
 namespace CommandInterpreter
 {
@@ -26,6 +28,8 @@ namespace CommandInterpreter
     public partial class MainWindow : Window
     {
         private WaitingWindow waitingWindow;
+        private List<double> coordinatesPoints;
+        private List<double> coordinatesCircles;
         private List<string> rawCommands;
         private string processedCommands;
         private bool isCommandClick;
@@ -37,10 +41,12 @@ namespace CommandInterpreter
         {
             InitializeComponent();
             rawCommands = new List<string>();
+            coordinatesPoints = new List<double>();
+            coordinatesCircles = new List<double>();
             isCommandClick = false;
             isRunClick = false;
             countCommands = 0;
-            lengthLastCommand = 0;
+            lengthLastCommand = 0;           
         }
 
         private void RunButtonClick(object sender, RoutedEventArgs e)
@@ -66,30 +72,42 @@ namespace CommandInterpreter
                     commandInputConsole.Text += "\r\n";
                     waitingWindow.Show();
                     waitingWindow.Owner = this;
-                    Timer timer = new Timer(CloseWaitingWindow, null, 500, Timeout.Infinite);
+                    Timer timer = new Timer(CloseWaitingWindow, null, 1000, Timeout.Infinite);
                 }
             }
         }
 
         private bool IsCommandCorrect(string lastCommand)
-        {
+        {       
             if (lastCommand == "Point" || lastCommand == "point"
                 || lastCommand == "Location" || lastCommand == "location")
             {
                 return true;
             }
             else if ((lastCommand.Contains("Move(") || lastCommand.Contains("move(")
-                || lastCommand.Contains("Circle(") || lastCommand.Contains("circle(")) 
-                && lastCommand.Split('(').Length == lastCommand.Split(')').Length
-                && lastCommand.Split('(').Length * 2 - 1 == lastCommand.Split(',').Length)
+                || lastCommand.Contains("Circle(") || lastCommand.Contains("circle(")))
             {
-                lastCommand = lastCommand.Remove(0, lastCommand.IndexOf('('));
-                lastCommand = lastCommand.Replace("(", "");
-                lastCommand = lastCommand.Replace(")", "");
-                lastCommand = lastCommand.Replace(" ", "");
-                lastCommand = lastCommand.Replace(",", "");
-                lastCommand = lastCommand.Replace(".", "");
-                if (lastCommand.All(char.IsDigit) )
+                return HasOnlyNumbers(lastCommand);
+            }
+            return false;
+        }
+
+        private bool HasOnlyNumbers(string lastCommand)
+        {
+            var numOpenBrackets = lastCommand.Split('(').Length - 1;
+            var numCloseBrackets = lastCommand.Split(')').Length - 1;
+            var sumBrackets = numOpenBrackets + numCloseBrackets;
+            var numCommas = lastCommand.Split(',').Length - 1;
+            if (numOpenBrackets == numCloseBrackets && sumBrackets == numCommas)
+            {
+                var pathToNumbers = lastCommand.Remove(0, lastCommand.IndexOf('('));
+                pathToNumbers = pathToNumbers.Replace("(", "");
+                pathToNumbers = pathToNumbers.Replace(")", "");
+                pathToNumbers = pathToNumbers.Replace(" ", "");
+                pathToNumbers = pathToNumbers.Replace(",", "");
+                pathToNumbers = pathToNumbers.Replace(".", "");
+                pathToNumbers = pathToNumbers.Replace("-", "");
+                if (pathToNumbers.All(char.IsDigit))
                     return true;
             }
             return false;
@@ -101,8 +119,34 @@ namespace CommandInterpreter
             var command = rawCommands.Last().Trim();
             command = command.Replace(" ", "");
             command = command.Trim('\n');
+            if (command.Contains("Move") || command.Contains("move")
+                || command.Contains("Circle") || command.Contains("circle"))
+                WritePointsToList(command);
             processedCommands += command + "\r\n";
             File.WriteAllText(@"C:\Users\Admin\Desktop\Программирование на C#\CommandInterpreter\commandsList.txt", processedCommands);
+        }
+
+        private void WritePointsToList(string command)
+        {
+            var points = command.Remove(0, command.IndexOf('(')).Split('(');
+            for (var i = 0; i < points.Length; i++)
+            {
+                var point = points[i].Trim(')').Split(',');
+                for (var j = 0; j < point.Length; j++)
+                {
+                    if (point[j].Trim().Length > 0)
+                    {
+                        var format = new NumberFormatInfo();
+                        format.NegativeSign = "-";
+                        format.NumberDecimalSeparator = ".";
+                        var coordinate = double.Parse(point[j].Trim(), format);
+                        if (points.Length == 2)
+                            coordinatesPoints.Add(coordinate);
+                        else
+                            coordinatesCircles.Add(coordinate);
+                    }              
+                }
+            }
         }
 
         private void CloseWaitingWindow(object state)
@@ -199,6 +243,26 @@ namespace CommandInterpreter
             }
 
             isCommandClick = true;
+        }
+
+        private void Move()
+        {
+
+        }
+
+        private void Point()
+        {
+
+        }
+
+        private void Circle()
+        {
+
+        }
+
+        private void Location()
+        {
+
         }
     }
 }
