@@ -66,12 +66,13 @@ namespace CommandInterpreter
                 if (commandInputConsole.Text.Length > 0 && isCommandClick)
                 {
                     waitingWindow = new WaitingWindow();
+                    waitingWindow.Owner = this;
+                    waitingWindow.WindowStartupLocation = WindowStartupLocation.CenterOwner;
                     isCommandClick = false;
                     countCommands++;
                     WriteCommandToFile();
                     commandInputConsole.Text += "\r\n";
                     waitingWindow.Show();
-                    waitingWindow.Owner = this;
                     Timer timer = new Timer(CloseWaitingWindow, null, 1000, Timeout.Infinite);
                 }
             }
@@ -84,8 +85,9 @@ namespace CommandInterpreter
             {
                 return true;
             }
-            else if ((lastCommand.Contains("Move(") || lastCommand.Contains("move(")
-                || lastCommand.Contains("Circle(") || lastCommand.Contains("circle(")))
+            else if (lastCommand.Contains("Move(") || lastCommand.Contains("move(")
+                || lastCommand.Contains("Plane(") || lastCommand.Contains("plane(")
+                || lastCommand.Contains("Circle(") || lastCommand.Contains("circle("))
             {
                 return HasOnlyNumbers(lastCommand);
             }
@@ -154,11 +156,19 @@ namespace CommandInterpreter
             if (waitingWindow != null) Dispatcher.Invoke(() => waitingWindow.Close());
         }
 
-        private void ClearButtonClick(object sender, RoutedEventArgs e)
+        //private void ClearButtonClick(object sender, RoutedEventArgs e)
+        //{
+        //    commandInputConsole.Text = "";
+        //    isRunClick = false;
+        //    countCommands = 0;
+        //}
+
+        private void CommentButtonClick(object sender, RoutedEventArgs e)
         {
-            commandInputConsole.Text = "";
-            isRunClick = false;
-            countCommands = 0;
+            var commentWindow = new CommentWindow();
+            commentWindow.Owner = this;
+            commentWindow.WindowStartupLocation = WindowStartupLocation.CenterOwner;
+            commentWindow.Show();
         }
 
         private void MoveButtonClick(object sender, RoutedEventArgs e)
@@ -197,6 +207,27 @@ namespace CommandInterpreter
             else if (isRunClick)
             {
                 commandInputConsole.Text += "Point";
+                isRunClick = false;
+            }
+
+            isCommandClick = true;
+        }
+
+        private void PlaneButtonClick(object sender, RoutedEventArgs e)
+        {
+            lengthLastCommand = commandInputConsole.Text.Split('\n').Last().Length;
+
+            if (commandInputConsole.Text.Length == 0 && !isRunClick)
+                commandInputConsole.Text = "Plane()()()";
+            else if (!isRunClick &&
+                !commandInputConsole.Text.Substring(commandInputConsole.Text.Length - 1).Contains(Environment.NewLine))
+            {
+                commandInputConsole.Text = commandInputConsole.Text.Remove(commandInputConsole.Text.Length - lengthLastCommand);
+                commandInputConsole.Text += "Plane()()()";
+            }
+            else if (isRunClick)
+            {
+                commandInputConsole.Text += "Plane()()()";
                 isRunClick = false;
             }
 
@@ -245,6 +276,34 @@ namespace CommandInterpreter
             isCommandClick = true;
         }
 
+        private void DeviationButtonClick(object sender, RoutedEventArgs e)
+        {
+            var settingDeviation = new SettingDeviationWindow();
+            settingDeviation.Owner = this;
+            settingDeviation.WindowStartupLocation = WindowStartupLocation.CenterOwner;
+            settingDeviation.Show();
+        }
+
+        private void ModelUIElement3D_MouseDown(object sender, MouseButtonEventArgs e)
+        {
+            MessageBox.Show("Произошло нажатие");
+            var point = new Point();
+            UIElement.TranslatePoint(point, relativeTo);
+        }
+
+        //private void CanvasOnMouseMove(object sender, MouseEventArgs e)
+        //{
+        //    Point position = e.GetPosition(Canvas);
+        //    Coordinates.Text = $"X: {position.X}, Y: {position.Y}";
+        //}
+
+        private Vector3D CreateNormal(Point3D p0, Point3D p1, Point3D p2)
+        {
+            Vector3D v0 = new Vector3D(p1.X - p0.X, p1.Y - p0.Y, p1.Z - p0.Z);
+            Vector3D v1 = new Vector3D(p2.X - p1.X, p2.Y - p1.Y, p2.Z - p1.Z);
+            return Vector3D.CrossProduct(v0, v1);
+        }
+
         private void Move()
         {
 
@@ -263,6 +322,12 @@ namespace CommandInterpreter
         private void Location()
         {
 
+        }
+
+        private void Viewport3D_MouseMove(object sender, MouseEventArgs e)
+        {
+            Vector3D vector3D = e.(this);
+            
         }
     }
 }

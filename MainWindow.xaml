@@ -6,29 +6,81 @@
         xmlns:local="clr-namespace:CommandInterpreter"
         mc:Ignorable="d"
         xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
-        Title="CommandInterpreter" Height="600" Width="1300">
+        Title="CommandInterpreter" Height="600" Width="1100">
     <Grid x:Name="MainRoot" RenderTransformOrigin="0.587,0.577" Margin="0,0,0,-16">
-        <Border BorderBrush="Black" BorderThickness="1" HorizontalAlignment="Left" VerticalAlignment="Top" MinWidth="521" MinHeight="38" Margin="0,51,0,0" RenderTransformOrigin="0.504,3.327" Height="38">
-            <StackPanel Orientation="Horizontal" Margin="0,0,-219,0" VerticalAlignment="Center" Height="62" RenderTransformOrigin="0.5,1.554">
-                <Button x:Name="runButton" Content="Run" Height="25" Width="86" Click="RunButtonClick" ClickMode="Press" Style="{StaticResource MaterialDesignRaisedLightButton}"/>
-                <Button x:Name="clearButton" Content="Clear" Height="25" Width="86" Click="ClearButtonClick" ClickMode="Press" Style="{StaticResource MaterialDesignRaisedLightButton}"/>
-                <Button x:Name="moveButton" Content="Move" Height="25" Width="87" Click="MoveButtonClick" ClickMode="Press" Style="{StaticResource MaterialDesignRaisedLightButton}"/>
-                <Button x:Name="pointButton" Content="Point" Height="25" Width="87" Click="PointButtonClick" ClickMode="Press" Style="{StaticResource MaterialDesignRaisedLightButton}"/>
-                <Button x:Name="circleButton" Content="Circle" Height="25" Width="87" Click="CircleButtonClick" ClickMode="Press" Style="{StaticResource MaterialDesignRaisedLightButton}"/>
-                <Button x:Name="locationButton" Content="Location" Height="25" Width="86" Click="LocationButtonClick" ClickMode="Press" Style="{StaticResource MaterialDesignRaisedLightButton}"/>
+        <Border BorderBrush="Black" BorderThickness="1" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="0,51,0,0" RenderTransformOrigin="0.504,3.327" Height="93" Width="469">
+            <StackPanel Orientation="Vertical" Margin="9,0,9,-19">
+                <StackPanel Orientation="Horizontal" Height="50" RenderTransformOrigin="0.5,1.554" >
+                    <Button x:Name="runButton" Content="Run" FontSize="20" Height="35" Width="112" Click="RunButtonClick" ClickMode="Press" Style="{StaticResource MaterialDesignRaisedLightButton}"/>
+                    <Button x:Name="commentButton" Content="Comment" FontSize="18" Height="35" Width="112" Click="CommentButtonClick" ClickMode="Press" Style="{StaticResource MaterialDesignRaisedLightButton}"/>
+                    <Button x:Name="moveButton" Content="Move" FontSize="18" Height="35" Width="112" Click="MoveButtonClick" ClickMode="Press" Style="{StaticResource MaterialDesignRaisedLightButton}"/>
+                    <Button x:Name="pointButton" Content="Point" FontSize="18" Height="35" Width="112" Click="PointButtonClick" ClickMode="Press" Style="{StaticResource MaterialDesignRaisedLightButton}"/>
+                </StackPanel>
+                <StackPanel Orientation="Horizontal">
+                    <Button x:Name="planeButton" Content="Plane" FontSize="18" Height="35" Width="112" Click="PlaneButtonClick" ClickMode="Press" Style="{StaticResource MaterialDesignRaisedLightButton}"/>
+                    <Button x:Name="circleButton" Content="Circle" FontSize="18" Height="35" Width="112" Click="CircleButtonClick" ClickMode="Press" Style="{StaticResource MaterialDesignRaisedLightButton}"/>
+                    <Button x:Name="locationButton" Content="Location" FontSize="18" Height="35" Width="112" Click="LocationButtonClick" ClickMode="Press" Style="{StaticResource MaterialDesignRaisedLightButton}"/>
+                    <Button x:Name="deviationButton" Content="Deviation" FontSize="18" Height="35" Width="112" Click="DeviationButtonClick" ClickMode="Press" Style="{StaticResource MaterialDesignRaisedLightButton}"/>
+                </StackPanel>
             </StackPanel>
         </Border>
-        <Border BorderBrush="Black" BorderThickness="1" HorizontalAlignment="Left" MinHeight="51" VerticalAlignment="Top" MinWidth="521" Height="51" >
-            <TextBlock HorizontalAlignment="Left" Height="71" TextWrapping="Wrap" Text="Editor" TextAlignment="Center" FontSize="45" FontWeight="Medium" VerticalAlignment="Top" Width="521" />
+        <Border BorderBrush="Black" BorderThickness="1" HorizontalAlignment="Left" VerticalAlignment="Top" Width="469" Height="51" >
+            <TextBlock HorizontalAlignment="Left" Height="71" Text="Editor" TextAlignment="Center" FontSize="45" FontWeight="Medium" VerticalAlignment="Top" Width="467" />
         </Border>
-        <Border BorderBrush="Black" BorderThickness="1" HorizontalAlignment="Left" MinHeight="572" Margin="521,0,0,0" VerticalAlignment="Top" MinWidth="779" Background="#CBB4CF"/>
-        <Border BorderBrush="Black" BorderThickness="1" HorizontalAlignment="Left" MinHeight="483" Margin="0,89,0,0" VerticalAlignment="Top" MinWidth="521">
-            <Border BorderBrush="Black" BorderThickness="1" HorizontalAlignment="Center" MinHeight="464" VerticalAlignment="Center" MinWidth="501" CornerRadius="15">
+        <!--<Border BorderBrush="Black" BorderThickness="1" HorizontalAlignment="Left" Margin="469,0,0,16" VerticalAlignment="Top" Background="#CBB4CF" Width="648" Height="584"/>-->
+        <Border BorderBrush="Black" BorderThickness="1" HorizontalAlignment="Left" Margin="0,144,0,0" VerticalAlignment="Top" Height="440" Width="469">
+            <Border BorderBrush="Black" BorderThickness="1" HorizontalAlignment="Center" Height="420" VerticalAlignment="Center" Width="448" CornerRadius="15">
                 <Border.Effect>
                     <DropShadowEffect BlurRadius="30" Color="Gray" ShadowDepth="0"/>
                 </Border.Effect>
                 <TextBox x:Name="commandInputConsole" materialDesign:HintAssist.Hint="Write command ..." FontSize="22" VerticalScrollBarVisibility="Visible" TextWrapping="Wrap" AcceptsReturn="True" Margin="9,9,9,9" />
             </Border>
+        </Border>
+        <!--<Border BorderBrush="Black" BorderThickness="1" Margin="469,0,0,16">
+            <Canvas x:Name="Canvas" Background="#CBB4CF" MouseMove="CanvasOnMouseMove"  VerticalAlignment="Top" Height="584"/>
+        </Border>
+        <TextBlock x:Name="Coordinates" Margin="918,462,10,41" FontSize="16"/>-->
+
+        <Slider Height="25" Minimum="0" Maximum="360"
+                Value="{Binding ElementName=rotate, Path= Angle}" Margin="496,72,34,503" />
+        <Border BorderBrush="Black" BorderThickness="1" VerticalAlignment="Top" HorizontalAlignment="Right" Width="631" Height="584">
+            <Viewport3D>
+                <Viewport3D.Camera>
+                    <PerspectiveCamera x:Name="camera" Position="0.5,0.5,3.5" LookDirection="0,0,-3.5"  />
+                </Viewport3D.Camera>
+                <Viewport3D.Children>
+                    <ModelVisual3D>
+                        <ModelVisual3D.Content>
+                            <DirectionalLight Color="White" Direction="-1,-1,-2" />
+                        </ModelVisual3D.Content>
+                    </ModelVisual3D>
+                    <ModelUIElement3D MouseDown="ModelUIElement3D_MouseDown">
+                        <ModelUIElement3D.Model>
+                            <GeometryModel3D>
+                                <GeometryModel3D.Geometry>
+                                    <MeshGeometry3D Positions="0,0,0 1,0,0 0,1,0 1,1,0 
+                      0,0,1 1,0,1 0,1,1 1,1,1"
+     TriangleIndices="0,2,1 1,2,3 0,4,2 2,4,6 
+                      0,1,4 1,5,4 1,7,5 1,3,7
+                      4,5,6 7,6,5 2,6,3 3,6,7"/>
+                                </GeometryModel3D.Geometry>
+                                <GeometryModel3D.Material>
+                                    <DiffuseMaterial Brush="Blue" />
+                                </GeometryModel3D.Material>
+                            </GeometryModel3D>
+                        </ModelUIElement3D.Model>
+                        <ModelUIElement3D.Transform>
+                            <Transform3DGroup>
+                                <RotateTransform3D>
+                                    <RotateTransform3D.Rotation>
+                                        <AxisAngleRotation3D x:Name="rotate" Axis="0 1 0" Angle="30" />
+                                    </RotateTransform3D.Rotation>
+                                </RotateTransform3D>
+                            </Transform3DGroup>
+                        </ModelUIElement3D.Transform>
+                    </ModelUIElement3D>
+                </Viewport3D.Children>
+            </Viewport3D>
         </Border>
     </Grid>
 </Window>
