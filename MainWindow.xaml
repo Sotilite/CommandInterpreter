@@ -6,37 +6,52 @@
         xmlns:local="clr-namespace:CommandInterpreter"
         mc:Ignorable="d"
         xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
-        Title="CommandInterpreter" Height="668" Width="1130">
+        Title="CommandInterpreter" Height="669" Width="1135" ResizeMode="CanMinimize">
     <Grid x:Name="MainRoot" RenderTransformOrigin="0.587,0.577" Margin="0,0,0,-16">
-        <Border BorderBrush="Black" BorderThickness="1" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="0,51,0,0" RenderTransformOrigin="0.504,3.327" Height="75" Width="469">
-            <StackPanel Orientation="Vertical" Margin="-1,0,-1,0" Height="69" VerticalAlignment="Center">
-                <StackPanel Orientation="Horizontal" Width="455" Margin="1,1,1,1" RenderTransformOrigin="0.5,0.5">
-                    <Button x:Name="runButton" Content="Run" FontSize="14" Height="30" Width="91" Click="RunButtonClick" ClickMode="Press" Style="{StaticResource MaterialDesignRaisedLightButton}"/>
-                    <Button x:Name="clearButton" Content="Clear" FontSize="14" Height="30" Width="91" Click="ClearButtonClick" ClickMode="Press" Style="{StaticResource MaterialDesignRaisedLightButton}"/>
+        <Border BorderBrush="Black" BorderThickness="1" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="0,51,0,0" RenderTransformOrigin="0.504,3.327" Height="71" Width="469">
+            <StackPanel Orientation="Vertical" Margin="-1,0,-1,0" Height="65" VerticalAlignment="Center">
+                <StackPanel Orientation="Horizontal" Width="455" Margin="1,1,1,1" RenderTransformOrigin="0.5,0.5" Cursor="">
+                    <Button x:Name="runButton" Content="Run" FontSize="14" Height="30" Width="72" Click="RunButtonClick" ClickMode="Press" Style="{StaticResource MaterialDesignRaisedLightButton}"/>
+                    <Button x:Name="continueButton" Content="Continue" FontSize="14" Height="30" Width="91" Click="ContinueButtonClick" ClickMode="Press" Style="{StaticResource MaterialDesignRaisedLightButton}"/>
                     <Button x:Name="saveFileButton" Content="Save file" FontSize="14" Height="30" Width="91" Click="SaveFileButtonClick" ClickMode="Press" Style="{StaticResource MaterialDesignRaisedLightButton}"/>
                     <Button x:Name="openFileButton" Content="Open file" FontSize="14" Height="30" Width="91" Click="OpenFileButtonClick" ClickMode="Press" Style="{StaticResource MaterialDesignRaisedLightButton}"/>
                     <Button x:Name="commentButton" Content="Comment" FontSize="13" Height="30" Width="91" Click="CommentButtonClick" ClickMode="Press" Style="{StaticResource MaterialDesignRaisedLightButton}"/>
+                    <CheckBox x:Name="comment" Height="30" Width="19" Click="IsCommentClick" Background="Black"/>
                 </StackPanel>
                 <StackPanel Orientation="Horizontal" Width="455" Margin="1,1,1,1">
-                    <Button x:Name="moveButton" Content="Move" FontSize="14" Height="30" Width="91" Click="MoveButtonClick" ClickMode="Press" Style="{StaticResource MaterialDesignRaisedLightButton}"/>
-                    <Button x:Name="pointButton" Content="Point" FontSize="14" Height="30" Width="91" Click="PointButtonClick" ClickMode="Press" Style="{StaticResource MaterialDesignRaisedLightButton}"/>
+                    <Button x:Name="moveButton" Content="Move" FontSize="14" Height="30" Width="72" Click="MoveButtonClick" ClickMode="Press" Style="{StaticResource MaterialDesignRaisedLightButton}"/>
+                    <Button x:Name="pointButton" Content="Point" FontSize="14" Height="30" Width="80" Click="PointButtonClick" ClickMode="Press" Style="{StaticResource MaterialDesignRaisedLightButton}"/>
                     <Button x:Name="planeButton" Content="Plane" FontSize="14" Height="30" Width="91" Click="PlaneButtonClick" ClickMode="Press" Style="{StaticResource MaterialDesignRaisedLightButton}"/>
                     <Button x:Name="circleButton" Content="Circle" FontSize="14" Height="30" Width="91" Click="CircleButtonClick" ClickMode="Press" Style="{StaticResource MaterialDesignRaisedLightButton}"/>
-                    <Button x:Name="deviationButton" Content="Deviation" FontSize="13" Height="30" Width="91" Click="DeviationButtonClick" ClickMode="Press" Style="{StaticResource MaterialDesignRaisedLightButton}"/>
+                    <Button x:Name="locationButton" Content="Location" FontSize="14" Height="30" Width="91" Click="LocationButtonClick" ClickMode="Press" Style="{StaticResource MaterialDesignRaisedLightButton}"/>
+                    <Button x:Name="settingDeviation" Content="{materialDesign:PackIcon Cog}" Height="30" Width="30" Click="SettingDeviationClick" Style="{StaticResource MaterialDesignFloatingActionLightButton}"/>
                 </StackPanel>
             </StackPanel>
         </Border>
         <Border BorderBrush="Black" BorderThickness="1" HorizontalAlignment="Left" VerticalAlignment="Top" Width="469" Height="51" >
             <TextBlock HorizontalAlignment="Center" Height="50" Text="Editor" TextAlignment="Center" FontSize="45" FontWeight="Medium" VerticalAlignment="Center" Width="467" />
         </Border>
-        <Border BorderBrush="Black" BorderThickness="1" HorizontalAlignment="Left" Margin="469,0,0,0" VerticalAlignment="Top" Background="#CBB4CF" Width="648" Height="630"/>
-        <Border BorderBrush="Black" BorderThickness="1" HorizontalAlignment="Left" Margin="0,126,0,0" VerticalAlignment="Top" Height="504" Width="469">
-            <Border BorderBrush="Black" BorderThickness="1"  Height="484" VerticalAlignment="Center" CornerRadius="15" Margin="9,0,9,0">
-                <Border.Effect>
-                    <DropShadowEffect BlurRadius="30" Color="Gray" ShadowDepth="0"/>
-                </Border.Effect>
-                <TextBox x:Name="commandInputConsole" materialDesign:HintAssist.Hint="Write command ..." FontSize="22" VerticalScrollBarVisibility="Visible" HorizontalScrollBarVisibility="Visible" AcceptsReturn="True" Margin="9,9,9,9" />
-            </Border>
+        <Border BorderBrush="Black" BorderThickness="1" HorizontalAlignment="Left" Margin="469,0,0,0" VerticalAlignment="Top" Background="#CBB4CF" Width="654" Height="630"/>
+        <Border BorderBrush="Black" BorderThickness="1" HorizontalAlignment="Left" Margin="0,122,0,0" VerticalAlignment="Top" Height="508" Width="469">
+            <StackPanel VerticalAlignment="Center" Height="508">
+                <TextBlock Text="INPUT" FontSize="22" FontWeight="Medium" Margin="20, 0, 20, 0" Height="25" />
+                <Border BorderBrush="Black" BorderThickness="1"  Height="270" CornerRadius="15" Margin="10,0, 10, 5">
+                    <Border.Effect>
+                        <DropShadowEffect BlurRadius="30" Color="Gray" ShadowDepth="0"/>
+                    </Border.Effect>
+                    <TextBox x:Name="commandInputConsole" materialDesign:HintAssist.Hint="Write command ..." FontSize="22" VerticalScrollBarVisibility="Visible" HorizontalScrollBarVisibility="Visible" AcceptsReturn="True" Margin="10"/>
+                </Border>
+                <TextBlock Text="OUTPUT" FontSize="22" FontWeight="Medium" Margin="20, 0, 20, 0" Height="25" />
+                <Border BorderBrush="Black" BorderThickness="1" CornerRadius="15" Margin="10, 0, 10, 10" Height="174">
+                    <Border.Effect>
+                        <DropShadowEffect BlurRadius="30" Color="Gray" ShadowDepth="0"/>
+                    </Border.Effect>
+                    <ScrollViewer Margin="10" HorizontalScrollBarVisibility="Visible" VerticalScrollBarVisibility="Visible">
+                        <TextBlock x:Name="commandOutputConsole" FontSize="18" Background="{Binding}">
+                        </TextBlock>
+                    </ScrollViewer>
+                </Border>
+            </StackPanel>
         </Border>
     </Grid>
 </Window>

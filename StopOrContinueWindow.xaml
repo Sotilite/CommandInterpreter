@@ -1,0 +1,25 @@
+﻿<Window x:Class="CommandInterpreter.StopOrContinueWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:CommandInterpreter"
+        mc:Ignorable="d"
+        Title="StopOrContinueWindow" Height="217" Width="360" ResizeMode="CanMinimize">
+    <Grid Background="LightGray">
+        <Border Margin="20" CornerRadius="20" Background="White">
+            <Border.Effect>
+                <DropShadowEffect BlurRadius="30" Color="LightGray" ShadowDepth="0"/>
+            </Border.Effect>
+            <StackPanel>
+                <ScrollViewer Margin="30, 15, 30, 0" VerticalScrollBarVisibility="Visible" Height="66">
+                    <TextBlock x:Name="commentText" TextWrapping="Wrap" FontSize="18" TextAlignment="Center"/>
+                </ScrollViewer>
+                <StackPanel Margin="30, 0, 30, 10" Orientation="Horizontal" HorizontalAlignment="Center" Height="57">
+                    <Button Content="Continue" Margin="10, 10, 30, 10" Width="90" Click="ContinueButtonClick" ClickMode="Press"/>
+                    <Button Content="Stop" Margin="30, 10, 10, 10" Width="90" Click="StopButtonClick" ClickMode="Press"/>
+                </StackPanel>
+            </StackPanel>
+        </Border>
+    </Grid>
+</Window>
