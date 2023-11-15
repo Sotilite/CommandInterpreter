@@ -14,9 +14,6 @@ using System.Windows.Shapes;
 
 namespace CommandInterpreter
 {
-    /// <summary>
-    /// Логика взаимодействия для StopOrContinueWindow.xaml
-    /// </summary>
     public partial class StopOrContinueWindow : Window
     {
         public bool IsStop;
@@ -26,16 +23,10 @@ namespace CommandInterpreter
             IsStop = false;
         }
 
-        private void ContinueButtonClick(object sender, RoutedEventArgs e)
-        {
-            var mainWindow = new MainWindow();
-            this.Close();
-            mainWindow.IsContinue = true;
-        }
+        private void ContinueButtonClick(object sender, RoutedEventArgs e) => this.Close();
 
         private void StopButtonClick(object sender, RoutedEventArgs e)
         {
-            var mainWindow = new MainWindow();
             IsStop = true;
             this.Close();
         }

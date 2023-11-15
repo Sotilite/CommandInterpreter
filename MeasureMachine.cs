@@ -1,4 +1,5 @@
-﻿using System;
+﻿using MaterialDesignColors.Recommended;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -12,24 +13,18 @@ namespace CommandInterpreter
 {
     public class MeasureMachine
     {
-        private int machineHandLength;
         private Random random;
 
         public MeasureMachine()
         {
-            machineHandLength = 50;
             random = new Random();
         }
 
-        public string Move(KeyValuePair<string, string> commandAndValue)
+        public string Move(string textCommand, TextBlock commandOutputConsole, string command)
         {
-            var nominalValue = commandAndValue.Value.Remove(0, commandAndValue.Value.IndexOf('(')); ;
+            var nominalValue = textCommand;
             string[] rawCoordinates = nominalValue.Split(',');
-            if (rawCoordinates.Length < 3)
-            {
-                MessageBox.Show("Произошло необработанное исключение: Входная строка имела неверный формат", "Exception Window", MessageBoxButton.OK, MessageBoxImage.Warning);
-                return null;
-            }
+            if (rawCoordinates.Length < 3) return null;
             var settingDeviationWindow = new SettingDeviationWindow();
             var treatedCoord = new double[3];
             var sumOfSquares = 0.0;
@@ -43,27 +38,22 @@ namespace CommandInterpreter
                 {
                     coord = double.Parse(coordinate);
                 }
-                catch (Exception ex)
+                catch
                 {
-                    MessageBox.Show("Произошло необработанное исключение: " + ex.Message, "Exception Window", MessageBoxButton.OK, MessageBoxImage.Warning);
                     return null;
                 }
                 sumOfSquares += coord * coord;
                 treatedCoord[i] = coord;
             }
             var distanceFromMachHand = Math.Sqrt(sumOfSquares);
-            if (distanceFromMachHand > machineHandLength)
-            {
-                MessageBox.Show("Произошло необработанное исключение: Координаты выходят за границы возможностей машины", "Exception Window", MessageBoxButton.OK, MessageBoxImage.Warning);
-                return null;
-            }
+
             return $"({treatedCoord[0]}, {treatedCoord[1]}, {treatedCoord[2]})";
         }
 
-        public (string, double) Point(KeyValuePair<string, string> command, double deviation)
+        public (string, double) Point(string command, double deviation, TextBlock commandOutputConsole)
         {
             System.Threading.Thread.CurrentThread.CurrentCulture = new System.Globalization.CultureInfo("en-US");
-            var data = command.Value.Remove(0, command.Value.IndexOf('('));
+            var data = command.Remove(0, command.IndexOf('('));
             var strNormalVector = data.Remove(0, data.IndexOf('[') + 1).Trim(']');
             var coordNormalVector = strNormalVector.Split(',');
             var normalVector = new double[3];
@@ -86,9 +76,8 @@ namespace CommandInterpreter
                     if (coordNormalVector.Length == 3)
                         normalVector[i] = Convert.ToDouble(coordNormalVector[i]);
                 }
-                catch (Exception ex)
+                catch
                 {
-                    MessageBox.Show("Произошло необработанное исключение: " + ex.Message, "Exception Window", MessageBoxButton.OK, MessageBoxImage.Warning);
                     return (null, double.NaN);
                 }
             }
@@ -107,14 +96,14 @@ namespace CommandInterpreter
                 $"[{normalVector[0]}, {normalVector[1]}, {normalVector[2]}]\r\nActual: {strActPoint}", distance);
         }
 
-        public string GetProjectionPoint(string nameCommand, string data, double[] normalVector, double[] pointPlane, double deviation)
+        public (string, double[])GetProjectionPoint(string nameCommand, string data, double[] normalVector, double[] pointPlane, double deviation)
         {
             var strPoint = data.Remove(0, data.IndexOf('('));
             strPoint = strPoint.Remove(strPoint.IndexOf('[')).Trim(')');
             var point = GetCoordinatePoint(strPoint, 0);
             var t = (normalVector[0] * (pointPlane[0] - point[0]) + normalVector[1] * (pointPlane[1] - point[1]) +
-                normalVector[2] * (pointPlane[2] - point[2])) / (pointPlane[0] * pointPlane[0] + pointPlane[1] * pointPlane[1]
-                + pointPlane[2] * pointPlane[2]);
+                normalVector[2] * (pointPlane[2] - point[2])) / (normalVector[0] * normalVector[0] + normalVector[1] * normalVector[1]
+                + normalVector[2] * normalVector[2]);
             var nomProjPoint = new double[3];
             var strNomProjPoint = "";
             var numRounding = 1;
@@ -127,15 +116,14 @@ namespace CommandInterpreter
                 else strNomProjPoint += nomProjPoint[i];
             }
             var actualProjPoint = GetCoordinatePoint(strNomProjPoint, deviation);
-            return $"Nominal: ({nomProjPoint[0]}, {nomProjPoint[1]}, {nomProjPoint[2]})\r\n" +
-                $"Actual: ({actualProjPoint[0]}, {actualProjPoint[1]}, {actualProjPoint[2]})";
+            return ($"Nominal: ({nomProjPoint[0]}, {nomProjPoint[1]}, {nomProjPoint[2]})\r\n" +
+                $"Actual: ({actualProjPoint[0]}, {actualProjPoint[1]}, {actualProjPoint[2]})", nomProjPoint);
         }
 
-        public (string, double[], double[]) Plane(KeyValuePair<string, string> command, string[] namesPoints, double deviation)
+        public (string, double[], double[]) Plane(string command, string[] namesPoints, double deviation)
         {
-            var pointsPlane = command.Value.Remove(0, command.Value.IndexOf('('));
+            var pointsPlane = command.Remove(0, command.IndexOf('('));
             var arrayPoints = pointsPlane.Split('(');
-            //if (arrayPoints.Length < 3) return "Недостаточно точек для построения плоскости";
             var nominalFirstPoint = GetCoordinatePoint(arrayPoints[1], 0);
             var nominalSecondPoint = GetCoordinatePoint(arrayPoints[2], 0);
             var nominalThirdPoint = GetCoordinatePoint(arrayPoints[3], 0);
@@ -144,8 +132,8 @@ namespace CommandInterpreter
             var actualThirdPoint = GetCoordinatePoint(arrayPoints[3], deviation);
             var nominalAveragePoint = new double[3];
             var actualAveragePoint = new double[3];
-            var nominalNorVector = GetNormalVector(nominalFirstPoint, nominalSecondPoint, nominalThirdPoint, deviation);
-            var actualNorVector = GetNormalVector(actualFirstPoint, actualSecondPoint, actualThirdPoint, deviation);
+            var nominalNorVector = GetNormalVector(nominalFirstPoint, nominalSecondPoint, nominalThirdPoint);
+            var actualNorVector = GetNormalVector(actualFirstPoint, actualSecondPoint, actualThirdPoint);
             var numRounding = 1;
             if (deviation.ToString().Contains('.'))
                 numRounding = deviation.ToString().Split('.')[1].Length;
@@ -165,10 +153,10 @@ namespace CommandInterpreter
                 nominalNorVector, nominalFirstPoint);
         }
 
-        public (string, double, double, double, string, string) Circle(KeyValuePair<string, string> command,
+        public (string, double, double, double, string, string) Circle(string command,
             string[] namesPoints, double pointDeviation, double centerDeviation, double radiusDeviation)
         {
-            var pointsCircle = command.Value.Remove(0, command.Value.IndexOf('('));
+            var pointsCircle = command.Remove(0, command.IndexOf('('));
             var arrayPoints = pointsCircle.Split('(');
             var nominalFirstPoint = GetCoordinatePoint(arrayPoints[1], 0);
             var nominalSecondPoint = GetCoordinatePoint(arrayPoints[2], 0);
@@ -178,7 +166,7 @@ namespace CommandInterpreter
             var actualThirdPoint = GetCoordinatePoint(arrayPoints[3], pointDeviation);
             var nominalCenterPoint = GetCenterPoint(nominalFirstPoint, nominalSecondPoint, nominalThirdPoint, centerDeviation);
             var actualCenterPoint = GetCenterPoint(actualFirstPoint, actualSecondPoint, actualThirdPoint, centerDeviation);
-            var normalVector = GetNormalVector(nominalFirstPoint, nominalSecondPoint, nominalThirdPoint, pointDeviation);
+            var normalVector = GetNormalVector(nominalFirstPoint, nominalSecondPoint, nominalThirdPoint);
             var numRounding = 2;
             if (radiusDeviation.ToString().Contains('.'))
                 numRounding = radiusDeviation.ToString().Split('.')[1].Length;
@@ -217,7 +205,7 @@ namespace CommandInterpreter
         private double[] GetCenterPoint(double[] firstPoint, double[] secondPoint, double[] thirdPoint, double deviation)
         {
             //Находим нормальный вектор
-            var normalVector = GetNormalVector(firstPoint, secondPoint, thirdPoint, deviation);
+            var normalVector = GetNormalVector(firstPoint, secondPoint, thirdPoint);
             var sidesSquareNorVec = normalVector[0] * normalVector[0] +
                 normalVector[1] * normalVector[1] + normalVector[2] * normalVector[2];
 
@@ -225,10 +213,25 @@ namespace CommandInterpreter
             var coefFirstEquat = GetCoefficientEquation(firstPoint);
             var coefSecondEquat = GetCoefficientEquation(secondPoint);
             var coefThirdEquat = GetCoefficientEquation(thirdPoint);
+            var generalDeterminant = GetValueDeterminant(0, 1, 2, coefFirstEquat, coefSecondEquat, coefThirdEquat);
+            var x = 0.0;
+            if (generalDeterminant == 0)
+            {
+                var joinArray = coefFirstEquat.Take(3).ToArray().Concat(coefSecondEquat.Take(3).ToArray()).ToArray();
+                joinArray = joinArray.Concat(coefThirdEquat.Take(3).ToArray()).ToArray();
+                var minNumber = joinArray.Min();
+                x = -minNumber + 1;
+                for (var i = 0; i < 3; i++)
+                {
+                    coefFirstEquat[i] += x;
+                    coefSecondEquat[i] += x;
+                    coefThirdEquat[i] += x;
+                }
+                generalDeterminant = GetValueDeterminant(0, 1, 2, coefFirstEquat, coefSecondEquat, coefThirdEquat);
+            }
 
             //Решаем сиcтему уравнений методом Крамера
             var fourthPoint = new double[3];
-            var generalDeterminant = GetValueDeterminant(0, 1, 2, coefFirstEquat, coefSecondEquat, coefThirdEquat);
             var firstDeterminant = GetValueDeterminant(3, 1, 2, coefFirstEquat, coefSecondEquat, coefThirdEquat);
             var secondDeterminant = GetValueDeterminant(0, 3, 2, coefFirstEquat, coefSecondEquat, coefThirdEquat);
             var thirdDeterminant = GetValueDeterminant(0, 1, 3, coefFirstEquat, coefSecondEquat, coefThirdEquat);
@@ -251,23 +254,24 @@ namespace CommandInterpreter
             return centerPoint;
         }
 
-        private double[] GetNormalVector(double[] firstPoint, double[] secondPoint, double[] thirdPoint, double deviation)
+        private double[] GetNormalVector(double[] firstPoint, double[] secondPoint, double[] thirdPoint)
         {
             var firstVector = new double[3];
             var secondVector = new double[3];
             var normalVector = new double[3];
-            var numRounding = 1;
-            if (deviation.ToString().Contains('.'))
-                numRounding = deviation.ToString().Split('.')[1].Length;
 
             for (var i = 0; i < 3; i++)
             {
                 firstVector[i] = secondPoint[i] - firstPoint[i];
                 secondVector[i] = thirdPoint[i] - firstPoint[i];
             }
-            normalVector[0] = Math.Round(firstVector[1] * secondVector[2] - firstVector[2] * secondVector[1], numRounding);
-            normalVector[1] = Math.Round(-(firstVector[0] * secondVector[2] - firstVector[2] * secondVector[0]), numRounding);
-            normalVector[2] = Math.Round(firstVector[0] * secondVector[1] - firstVector[1] * secondVector[0], numRounding);
+
+            normalVector[0] = firstVector[1] * secondVector[2] - firstVector[2] * secondVector[1];
+            normalVector[1] = -(firstVector[0] * secondVector[2] - firstVector[2] * secondVector[0]);
+            normalVector[2] = firstVector[0] * secondVector[1] - firstVector[1] * secondVector[0];
+            var lenNorVector = Math.Sqrt(normalVector[0] * normalVector[0] + normalVector[1] * normalVector[1] +
+                normalVector[2] * normalVector[2]);
+            for (var i = 0; i < 3; i++) normalVector[i] = Math.Round(normalVector[i] / lenNorVector, 4);
 
             return normalVector;
         }
@@ -342,43 +346,40 @@ namespace CommandInterpreter
             return roundedRadius;
         }
 
-        public string Location(KeyValuePair<string, string> command, string[] namesPoints, double deviation)
+        public string Location(string command, string[] namesPoints, double deviation, TextBlock commandOutputConsole)
         {
             System.Threading.Thread.CurrentThread.CurrentCulture = new System.Globalization.CultureInfo("en-US");
 
-            if (command.Value.Contains("POINT"))
+            if (command.Contains("POINT"))
             {
-                var strPointDeviation = command.Value.Remove(0, command.Value.IndexOf('[')).Trim('[');
+                var strPointDeviation = command.Remove(0, command.IndexOf('[')).Trim('[');
                 strPointDeviation = strPointDeviation.Trim(']');
                 var pointDeviation = 0.0;
                 try
                 {
                     pointDeviation = Convert.ToDouble(strPointDeviation);
                 }
-                catch (Exception ex)
+                catch
                 {
-                    MessageBox.Show("Произошло необработанное исключение: " + ex.Message, "Exception Window", MessageBoxButton.OK, MessageBoxImage.Warning);
                     return null;
                 }
-                var data = Point(command, pointDeviation);
-                return $": {command.Value.Remove(command.Value.IndexOf('('))}\r\nPosition: {data.Item2} ({pointDeviation})";
+                var data = Point(command, pointDeviation, commandOutputConsole);
+                return $": {command.Remove(command.IndexOf('('))}\r\nPosition: {data.Item2} ({pointDeviation})";
             }
             else
             {
-                var strDeviations = command.Value.Remove(0, command.Value.IndexOf('[')).Trim('[');
+                var strDeviations = command.Remove(0, command.IndexOf('[')).Trim('[');
                 var strCenterDeviation = strDeviations.Trim(']').Split(',')[0];
                 var strRadiusDeviation = strDeviations.Trim(']').Split(',')[1];
                 var centerDeviation = Convert.ToDouble(strCenterDeviation);
                 var radiusDeviaiton = Convert.ToDouble(strRadiusDeviation);
-                var key = command.Value.Remove(command.Value.IndexOf('('));
-                var value = command.Value.Remove(0, command.Value.IndexOf('('));
+                var value = command.Remove(0, command.IndexOf('('));
                 value = value.Remove(value.IndexOf('['));
-                var circleCommand = new KeyValuePair<string, string>(key, value);
-                var data = Circle(circleCommand, namesPoints, deviation, centerDeviation, radiusDeviaiton);
+                var data = Circle(value, namesPoints, deviation, centerDeviation, radiusDeviaiton);
                 var numRounding = 1;
                 if (radiusDeviaiton.ToString().Contains('.'))
                     numRounding = radiusDeviaiton.ToString().Split('.')[1].Length;
-                return $": {command.Value.Remove(command.Value.IndexOf('('))}\r\nPosition: {data.Item2} ({centerDeviation})\r\n" +
+                return $": {command.Remove(command.IndexOf('('))}\r\nPosition: {data.Item2} ({centerDeviation})\r\n" +
                     $"Radius: {data.Item3}, {data.Item4} ({Math.Abs(Math.Round(data.Item4 - data.Item3, numRounding))} / {radiusDeviaiton})";
             }
         }

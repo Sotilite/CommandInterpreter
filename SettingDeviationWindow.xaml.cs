@@ -23,20 +23,14 @@ namespace CommandInterpreter
         internal event EventHandler<DataEventArgs> DataChangedCenterDeviation;
         internal event EventHandler<DataEventArgs> DataChangedRadiusDeviation;
 
-        protected virtual void OnDataChangedPointDeviation(string data)
-        {
+        protected virtual void OnDataChangedPointDeviation(string data) =>
             DataChangedPointDeviation?.Invoke(this, new DataEventArgs(data));
-        }
 
-        protected virtual void OnDataChangedCenterDeviation(string data)
-        {
+        protected virtual void OnDataChangedCenterDeviation(string data) =>
             DataChangedCenterDeviation?.Invoke(this, new DataEventArgs(data));
-        }
 
-        protected virtual void OnDataChangedRadiusDeviation(string data)
-        {
+        protected virtual void OnDataChangedRadiusDeviation(string data) =>
             DataChangedRadiusDeviation?.Invoke(this, new DataEventArgs(data));
-        }
 
         public SettingDeviationWindow()
         {
@@ -67,10 +61,10 @@ namespace CommandInterpreter
             System.Threading.Thread.CurrentThread.CurrentCulture = new System.Globalization.CultureInfo("en-US");
             var text = pointDeviation.Text;
             var isCorrectPointDev = IsCorrect(pointDeviation);
-            var isCorrectCenterCircleDev = IsCorrect(centerCircleDeviation);
-            var isCorrectRadiusCircleDev = IsCorrect(radiusCircleDeviation);
+            var isCorrectCenterDev = IsCorrect(centerCircleDeviation);
+            var isCorrectRadiusDev = IsCorrect(radiusCircleDeviation);
 
-            if (isCorrectPointDev && isCorrectCenterCircleDev && isCorrectRadiusCircleDev)
+            if (isCorrectPointDev && isCorrectCenterDev && isCorrectRadiusDev)
             {
                 var mainWindow = new MainWindow();             
                 mainWindow.PointDeviation = Convert.ToDouble(pointDeviation.Text);
